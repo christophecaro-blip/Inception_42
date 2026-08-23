@@ -1,0 +1,57 @@
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb_container
+    build: ./requirements/mariadb
+    healthcheck:
+      test: ["CMD-SHELL", "[ \"$(cat /proc/1/comm)\" = \"mariadbd\" ] && mariadb-admin -u root -p$(cat /run/secrets/db_root_password) ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    secrets:
+      - db_password
+      - db_root_password
+    volumes:
+      - mariadb_data:/var/lib/mariadb
+    restart: unless-stopped
+
+  nginx:
+    image: nginx
+    container_name: nginx_container
+    build: ./requirements/nginx
+    ports:
+      - "443:443"
+    restart: unless-stopped
+
+  # wordpress:
+  #   image: wordpress
+  #   container_name: wordpress_container
+  #   build: ./requirements/wordpress
+  #   depends_on:
+  #     mariadb:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ccaro/data/mariadb
+      o: bind
+  # wordpress_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: /home/ccaro/data/wordpress
+  #     o: bind

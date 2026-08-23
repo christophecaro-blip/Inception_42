@@ -1,0 +1,9 @@
+[mysqld]
+datadir = /var/lib/mariadb
+socket = /run/mariadbd/mariadbd.sock
+bind_address=*
+port = 3306
+user = mysql
+
+[client]
+socket = /run/mariadbd/mariadbd.sock
