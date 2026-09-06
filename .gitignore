@@ -12,3 +12,4 @@ volumes.md
 secrets/
 srcs/requirements/*/data
 .env
+.env.example

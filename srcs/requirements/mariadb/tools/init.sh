@@ -3,12 +3,15 @@
 echo "Debut du script"
 
 mkdir -p /run/mariadbd
-chown mysql:mysql /run/mariadbd
+mkdir -p /var/lib/mariadb
+
+chown -R mysql:mysql /run/mariadbd
+chown -R mysql:mysql /var/lib/mariadb
 
 if [ ! -d '/var/lib/mariadb/mysql' ]; then
 	mariadb-install-db
 	mariadbd --datadir=/var/lib/mariadb &
-	until mariadb-admin ping; do
+	until mariadb-admin ping --silent; do
 		sleep 1
 	done
 	MYSQL_PASSWORD=$(cat /run/secrets/db_password)
